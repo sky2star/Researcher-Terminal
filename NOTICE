@@ -1,0 +1,15 @@
+Researcher Terminal (科研工作者终端)
+Copyright 2026 Researcher Terminal
+
+This product includes software developed by the Researcher Terminal project.
+
+Licensed under the Apache License, Version 2.0.
+
+================================================================================
+
+Third-party libraries used:
+
+- CustomTkinter
+
+- Pillow 
+

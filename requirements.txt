@@ -1,0 +1,6 @@
+# 科研工作者终端 - 依赖文件
+# Researcher Terminal Dependencies
+
+customtkinter==5.2.2
+Pillow==10.2.0
+
