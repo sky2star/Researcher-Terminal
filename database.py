@@ -205,6 +205,10 @@ class Database:
         task = self.get_task(task_id)
         if task:
             subtask = task.add_subtask(title, description)
+            # 如果任务已完成，添加新子任务后应该重新变为进行中
+            if task.status == TaskStatus.COMPLETED:
+                task.status = TaskStatus.IN_PROGRESS
+                task.completed_at = None
             self._save()
             return subtask
         return None
@@ -219,6 +223,14 @@ class Database:
                         if hasattr(st, key):
                             setattr(st, key, value)
                     task.updated_at = datetime.now()
+                    
+                    # 如果任务是已完成状态，但现在有子任务变成未完成，需要更新任务状态
+                    if task.status == TaskStatus.COMPLETED:
+                        has_incomplete = any(s.status != TaskStatus.COMPLETED for s in task.subtasks)
+                        if has_incomplete:
+                            task.status = TaskStatus.IN_PROGRESS
+                            task.completed_at = None
+                    
                     self._save()
                     return st
         return None
@@ -230,10 +242,76 @@ class Database:
             for i, st in enumerate(task.subtasks):
                 if st.id == subtask_id:
                     task.subtasks.pop(i)
+                    # 重新排序剩余子任务
+                    for j, remaining_st in enumerate(task.subtasks):
+                        remaining_st.order = j
                     task.updated_at = datetime.now()
                     self._save()
                     return True
         return False
+    
+    def move_subtask(self, task_id: str, subtask_id: str, direction: int) -> bool:
+        """移动子任务顺序 (direction: -1向上, 1向下)"""
+        task = self.get_task(task_id)
+        if task:
+            # 按order排序获取当前顺序
+            sorted_subtasks = sorted(task.subtasks, key=lambda x: x.order)
+            current_index = None
+            for i, st in enumerate(sorted_subtasks):
+                if st.id == subtask_id:
+                    current_index = i
+                    break
+            
+            if current_index is not None:
+                new_index = current_index + direction
+                if 0 <= new_index < len(sorted_subtasks):
+                    # 交换位置
+                    sorted_subtasks[current_index].order = new_index
+                    sorted_subtasks[new_index].order = current_index
+                    task.updated_at = datetime.now()
+                    self._save()
+                    return True
+        return False
+    
+    def move_task(self, task_id: str, direction: int) -> bool:
+        """移动任务顺序 (direction: -1向上, 1向下)"""
+        current_index = None
+        for i, t in enumerate(self.tasks):
+            if t.id == task_id:
+                current_index = i
+                break
+        
+        if current_index is not None:
+            new_index = current_index + direction
+            if 0 <= new_index < len(self.tasks):
+                # 交换位置
+                self.tasks[current_index], self.tasks[new_index] = self.tasks[new_index], self.tasks[current_index]
+                self._save()
+                return True
+        return False
+    
+    def update_exploration_note(self, task_id: str, note_id: str, **kwargs) -> Optional[ExplorationNote]:
+        """更新探索笔记"""
+        task = self.get_task(task_id)
+        if task:
+            for note in task.exploration_notes:
+                if note.id == note_id:
+                    for key, value in kwargs.items():
+                        if hasattr(note, key):
+                            setattr(note, key, value)
+                    task.updated_at = datetime.now()
+                    self._save()
+                    return note
+        return None
+    
+    def clear_task_conclusion(self, task_id: str) -> Optional[Task]:
+        """清除任务结论"""
+        task = self.get_task(task_id)
+        if task:
+            task.conclusion = ""
+            task.updated_at = datetime.now()
+            self._save()
+        return task
     
     def complete_subtask(self, task_id: str, subtask_id: str) -> bool:
         """完成子任务"""
