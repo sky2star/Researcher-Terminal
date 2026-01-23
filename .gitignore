@@ -1,0 +1,84 @@
+# Python
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# CustomTkinter & Tkinter
+
+# Dataset & Data Files
+# research_data.json 
+*.json.backup
+*.json.bak
+*.md
+!docs/plans/*.md
+!BACKUP_README.md
+
+# Backup Scripts 
+# auto_backup.sh
+# monitor_backup.sh
+
+# System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+*.swp
+*.swo
+*~
+Thumbs.db
+.worktrees/*
+
+# VS Code
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Google Colab & Jupyter
+.ipynb_checkpoints/
+*.ipynb
+.tox/
+
+# Project-specific
+.git-backup.log
+.backup.lock
+.worktrees/
+
+# Cache & Temp Files
+*.tmp
+*.temp
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/

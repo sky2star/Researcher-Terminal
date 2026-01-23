@@ -56,7 +56,18 @@ class ExplorationNote:
     content: str = ""
     insight: str = ""  # 获得的洞察/启发
     created_at: datetime = field(default_factory=datetime.now)
+    updated_at: datetime = field(default_factory=datetime.now)  # 最后修改时间
     is_breakthrough: bool = False  # 是否是突破性发现
+
+
+@dataclass
+class ExplorationNoteSearchResult:
+    """探索笔记搜索结果"""
+    task_id: str
+    task_title: str
+    task_mode: TaskMode
+    note: ExplorationNote
+    is_history: bool = False
 
 
 @dataclass
@@ -78,6 +89,7 @@ class Task:
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     title: str = ""
     description: str = ""
+    order: int = 0
     status: TaskStatus = TaskStatus.PENDING
     mode: TaskMode = TaskMode.PLANNING
     knowledge: TaskKnowledge = TaskKnowledge.KNOWN_WHAT_KNOWN_HOW
@@ -153,5 +165,5 @@ class Task:
         self.mode = TaskMode.PLANNING
         self.status = TaskStatus.IN_PROGRESS
         self.knowledge = TaskKnowledge.KNOWN_WHAT_KNOWN_HOW
+        # 保留探索笔记，不再移动到单独的历史字段
         self.updated_at = datetime.now()
-
